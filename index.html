@@ -1,36 +1,16 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <title>VanMoof AI Assistent</title>
+  <meta charset="UTF-8" />
+  <title>VanMoof Fiets Assistent</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>VanMoof Fiets AI Assistent</h2>
-  <div id="chat" style="max-width: 600px; padding: 10px;"></div>
-  <input id="input" type="text" placeholder="Wat is er mis met je fiets?" style="width: 400px;" />
-  <button onclick="ask()">Stel vraag</button>
+  <h1>VanMoof Hulp AI</h1>
+  <div id="chat"></div>
+  <input type="text" id="input" placeholder="Typ je probleem..." />
+  <button onclick="ask()">Stel Vraag</button>
 
-  <script type="module">
-    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0';
-
-    let ai;
-    (async () => {
-      ai = await pipeline('text-generation', 'Xenova/phi-2');
-      document.getElementById("chat").innerHTML += "<p><em>🤖 AI klaar voor gebruik.</em></p>";
-    })();
-
-    async function ask() {
-      const input = document.getElementById('input').value;
-      document.getElementById("chat").innerHTML += `<p><strong>Jij:</strong> ${input}</p>`;
-      document.getElementById("input").value = '';
-
-      const prompt = `Je bent een VanMoof fietsen expert. Een klant zegt: "${input}". Wat is er waarschijnlijk mis en wat moet hij doen?`;
-
-      const out = await ai(prompt, { max_new_tokens: 100 });
-      const antwoord = out[0].generated_text.replace(prompt, ''); // maak schoon
-
-      document.getElementById("chat").innerHTML += `<p><strong>AI:</strong> ${antwoord}</p>`;
-    }
-  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
