@@ -3,17 +3,22 @@ import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.11
 let ai;
 const chatBox = document.getElementById("chat");
 const inputBox = document.getElementById("input");
+const loader = document.getElementById("loader");
 
 async function loadAI() {
+  showLoader();
   ai = await pipeline('text-generation', 'Xenova/phi-2');
+  hideLoader();
   console.log("AI geladen.");
 }
 loadAI();
 
 async function ask() {
   const input = inputBox.value;
+  if (!input.trim()) return;
   chatBox.innerHTML += `<p><strong>Jij:</strong> ${input}</p>`;
   inputBox.value = '';
+  showLoader();
 
   const response = await fetch('faq.txt');
   const faq = await response.text();
@@ -30,4 +35,13 @@ Antwoord:`;
   const answer = out[0].generated_text.replace(prompt, '');
 
   chatBox.innerHTML += `<p><strong>AI:</strong> ${answer}</p>`;
+  hideLoader();
+}
+
+// Loader functies
+function showLoader() {
+  loader.classList.remove("hidden");
+}
+function hideLoader() {
+  loader.classList.add("hidden");
 }
