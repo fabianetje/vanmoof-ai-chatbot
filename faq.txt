@@ -1,0 +1,5 @@
+- Als het achterlicht niet werkt, controleer de kabels en accu.
+- Als de fiets piept bij het remmen, vervang de remblokken.
+- Schakelt de versnelling niet automatisch? Reset de firmware.
+- Werkt Bluetooth niet? Probeer een herstart van de fiets en de app.
+- Problemen met opladen? Gebruik originele oplader en controleer aansluiting.
