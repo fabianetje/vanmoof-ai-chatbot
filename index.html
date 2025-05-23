@@ -1,93 +1,36 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>VanMoof Probleem Chatbot</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-  #chat-container { width: 400px; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; }
-  #messages { flex-grow: 1; padding: 15px; overflow-y: auto; border-bottom: 1px solid #ccc; max-height: 500px; }
-  .message { margin-bottom: 15px; }
-  .user { text-align: right; }
-  .user .text { background: #0078d7; color: white; display: inline-block; padding: 10px 15px; border-radius: 20px; max-width: 80%; }
-  .bot .text { background: #e5e5ea; color: black; display: inline-block; padding: 10px 15px; border-radius: 20px; max-width: 80%; }
-  #input-area { display: flex; padding: 10px; }
-  #input { flex-grow: 1; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 20px; }
-  #send-btn { background: #0078d7; border: none; color: white; padding: 10px 20px; margin-left: 10px; border-radius: 20px; font-size: 16px; cursor: pointer; }
-  #send-btn:hover { background: #005a9e; }
-</style>
+  <meta charset="UTF-8">
+  <title>VanMoof AI Assistent</title>
 </head>
 <body>
+  <h2>VanMoof Fiets AI Assistent</h2>
+  <div id="chat" style="max-width: 600px; padding: 10px;"></div>
+  <input id="input" type="text" placeholder="Wat is er mis met je fiets?" style="width: 400px;" />
+  <button onclick="ask()">Stel vraag</button>
 
-<div id="chat-container">
-  <div id="messages"></div>
-  <div id="input-area">
-    <input type="text" id="input" placeholder="Typ je probleem hier..." autocomplete="off" />
-    <button id="send-btn">Verstuur</button>
-  </div>
-</div>
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0';
 
-<script>
-  const faq = [
-    { question: ["rem", "remmen"], answer: "Controleer of de remkabel niet is gebroken en stel de remmen bij." },
-    { question: ["accu", "batterij"], answer: "Laad de accu volledig op en controleer de verbindingen." },
-    { question: ["motor", "trapondersteuning"], answer: "Reset de motorcontroller door de fiets uit en aan te zetten." },
-    { question: ["display"], answer: "Controleer of het display goed vastzit en probeer het opnieuw op te starten." },
-    { question: ["licht"], answer: "Controleer de bedrading van het licht en de zekeringen." },
-    { question: ["fiets start niet", "niet starten"], answer: "Controleer de accu en alle verbindingskabels, en probeer een reset." }
-  ];
+    let ai;
+    (async () => {
+      ai = await pipeline('text-generation', 'Xenova/phi-2');
+      document.getElementById("chat").innerHTML += "<p><em>🤖 AI klaar voor gebruik.</em></p>";
+    })();
 
-  const messagesEl = document.getElementById('messages');
-  const inputEl = document.getElementById('input');
-  const sendBtn = document.getElementById('send-btn');
+    async function ask() {
+      const input = document.getElementById('input').value;
+      document.getElementById("chat").innerHTML += `<p><strong>Jij:</strong> ${input}</p>`;
+      document.getElementById("input").value = '';
 
-  function addMessage(text, sender) {
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message', sender);
-    const textSpan = document.createElement('span');
-    textSpan.classList.add('text');
-    textSpan.textContent = text;
-    msgDiv.appendChild(textSpan);
-    messagesEl.appendChild(msgDiv);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
+      const prompt = `Je bent een VanMoof fietsen expert. Een klant zegt: "${input}". Wat is er waarschijnlijk mis en wat moet hij doen?`;
 
-  function getAnswer(userText) {
-    userText = userText.toLowerCase();
-    for (const item of faq) {
-      for (const keyword of item.question) {
-        if (userText.includes(keyword)) {
-          return item.answer;
-        }
-      }
+      const out = await ai(prompt, { max_new_tokens: 100 });
+      const antwoord = out[0].generated_text.replace(prompt, ''); // maak schoon
+
+      document.getElementById("chat").innerHTML += `<p><strong>AI:</strong> ${antwoord}</p>`;
     }
-    return "Sorry, dat weet ik niet precies. Kun je het anders proberen of meer details geven?";
-  }
-
-  function sendMessage() {
-    const userText = inputEl.value.trim();
-    if (!userText) return;
-    addMessage(userText, 'user');
-    inputEl.value = '';
-
-    // Simuleer 'denktijd' van AI
-    setTimeout(() => {
-      const botResponse = getAnswer(userText);
-      addMessage(botResponse, 'bot');
-    }, 700);
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  inputEl.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      sendMessage();
-    }
-  });
-
-  // Welkomstbericht
-  addMessage("Hallo! Vertel me wat er mis is met je VanMoof, dan help ik je zo goed mogelijk.", 'bot');
-</script>
-
+  </script>
 </body>
 </html>
